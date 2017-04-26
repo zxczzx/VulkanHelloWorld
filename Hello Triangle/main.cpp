@@ -1,12 +1,8 @@
-#include <vulkan/vulkan.h>
-
-#include <iostream>
-#include <stdexcept>
-#include <functional>
 #include "HelloTriangleApplication.h"
+#include <iostream>
 
-int main() {
-
+int main() 
+{
 	HelloTriangleApplication app;
 
 	try 
