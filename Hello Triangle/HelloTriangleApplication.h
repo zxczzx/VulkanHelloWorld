@@ -22,6 +22,12 @@ public:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
+	const std::vector<Vertex> vertices = {
+		{ { 0.0f, -0.5f },	{ 1.0f, 1.0f, 1.0f } },
+		{ { 0.5f, 0.5f },	{ 0.0f, 1.0f, 0.0f } },
+		{ { -0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f } }
+	};
+
 private:
 	const int WIDTH;
 	const int HEIGHT;
@@ -40,6 +46,8 @@ private:
 	VDeleter<VkCommandPool> commandPool{ device, vkDestroyCommandPool };
 	VDeleter<VkSemaphore> imageAvailableSemaphore{ device, vkDestroySemaphore };
 	VDeleter<VkSemaphore> renderFinishedSemaphore{ device, vkDestroySemaphore };
+	VDeleter<VkBuffer> vertexBuffer{ device, vkDestroyBuffer };
+	VDeleter<VkDeviceMemory> vertexBufferMemory{ device, vkFreeMemory };
 
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkImage> swapChainImages;
@@ -59,6 +67,7 @@ private:
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	static void onWindowResized(GLFWwindow* window, int width, int height);
 	void recreateSwapChain();
@@ -74,13 +83,14 @@ private:
 	void createCommandPools();
 	void createCommandBuffers();
 	void createSemaphores();
+	void createVertexBuffer();
 	void initVulkan();
 	void drawFrame();
 	void mainLoop();
 	void createInstance();
 	void setupDebugCallback();
 
-	std::vector<const char*> getRequiredExtensions();
+	static std::vector<const char*> getRequiredExtensions();
 	bool checkValidationLayerSupport();
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code,
 		const char* layerPrefix, const char* msg, void* userData);
