@@ -786,8 +786,9 @@ void HelloTriangleApplication::createCommandBuffers()
 		VkBuffer vertexBuffers[] = { vertexBuffer };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-		vkCmdDraw(commandBuffers[i], vertices.size(), 1, 0, 0);
+		vkCmdDrawIndexed(commandBuffers[i], indices.size(), 1, 0, 0, 0);
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -828,6 +829,24 @@ void HelloTriangleApplication::createVertexBuffer()
 	copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 }
 
+void HelloTriangleApplication::createIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+	VDeleter<VkBuffer> stagingBuffer{ device, vkDestroyBuffer };
+	VDeleter<VkDeviceMemory> stagingBufferMemory{ device, vkFreeMemory };
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	void* data;
+	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, stagingBufferMemory);
+
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexMemoryBuffer);
+
+	copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+}
+
 void HelloTriangleApplication::initVulkan()
 {
 	createInstance();
@@ -842,6 +861,7 @@ void HelloTriangleApplication::initVulkan()
 	createFramebuffers();
 	createCommandPools();
 	createVertexBuffer();
+	createIndexBuffer();
 	createCommandBuffers();
 	createSemaphores();
 }

@@ -23,9 +23,14 @@ public:
 	};
 
 	const std::vector<Vertex> vertices = {
-		{ { 0.0f, -0.5f },	{ 1.0f, 1.0f, 1.0f } },
-		{ { 0.5f, 0.5f },	{ 0.0f, 1.0f, 0.0f } },
-		{ { -0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f } }
+		{ { -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f, 0.5f },	{ 1.0f, 1.0f, 1.0f } }
+	};
+
+	const std::vector<uint16_t> indices = {
+		0, 1, 2, 2, 3, 0
 	};
 
 private:
@@ -48,6 +53,8 @@ private:
 	VDeleter<VkSemaphore> renderFinishedSemaphore{ device, vkDestroySemaphore };
 	VDeleter<VkBuffer> vertexBuffer{ device, vkDestroyBuffer };
 	VDeleter<VkDeviceMemory> vertexBufferMemory{ device, vkFreeMemory };
+	VDeleter<VkBuffer> indexBuffer{ device, vkDestroyBuffer };
+	VDeleter<VkDeviceMemory> indexMemoryBuffer{ device, vkFreeMemory };
 
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkImage> swapChainImages;
@@ -86,6 +93,7 @@ private:
 	void createCommandBuffers();
 	void createSemaphores();
 	void createVertexBuffer();
+	void createIndexBuffer();
 	void initVulkan();
 	void drawFrame();
 	void mainLoop();
