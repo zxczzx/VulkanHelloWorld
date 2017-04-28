@@ -71,6 +71,8 @@ private:
 
 	static void onWindowResized(GLFWwindow* window, int width, int height);
 	void recreateSwapChain();
+	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VDeleter<VkBuffer>& buffer, VDeleter<VkDeviceMemory>& bufferMemory);
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 	void createLogicalDevice();
 	void createSurface();
