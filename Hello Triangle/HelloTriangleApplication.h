@@ -5,7 +5,7 @@
 #include "VDeleter.h"
 #include "Utilities.h"
 
-class HelloTriangleApplication 
+class HelloTriangleApplication
 {
 public:
 	HelloTriangleApplication();
@@ -41,9 +41,10 @@ private:
 	VDeleter<VkInstance> instance{ vkDestroyInstance };
 	VDeleter<VkSurfaceKHR> surface{ instance, vkDestroySurfaceKHR };
 	VDeleter<VkDevice> device{ vkDestroyDevice };
-	VDeleter<VkDebugReportCallbackEXT> callback { instance, Utilities::DestroyDebugReportCallbackEXT };
+	VDeleter<VkDebugReportCallbackEXT> callback{ instance, Utilities::DestroyDebugReportCallbackEXT };
 	VDeleter<VkSwapchainKHR> swapChain{ device, vkDestroySwapchainKHR };
 	std::vector<VDeleter<VkImageView>> swapChainImageViews;
+	VDeleter<VkDescriptorSetLayout> descriptorSetLayout{ device, vkDestroyDescriptorSetLayout };
 	VDeleter<VkPipelineLayout> pipelineLayout{ device, vkDestroyPipelineLayout };
 	VDeleter<VkRenderPass> renderPass{ device, vkDestroyRenderPass };
 	VDeleter<VkPipeline> graphicsPipeline{ device, vkDestroyPipeline };
@@ -56,6 +57,14 @@ private:
 	VDeleter<VkBuffer> indexBuffer{ device, vkDestroyBuffer };
 	VDeleter<VkDeviceMemory> indexMemoryBuffer{ device, vkFreeMemory };
 
+	VDeleter<VkBuffer> uniformStagingBuffer{ device, vkDestroyBuffer };
+	VDeleter<VkDeviceMemory> uniformStagingBufferMemory{ device, vkFreeMemory };
+	VDeleter<VkBuffer> uniformBuffer{ device, vkDestroyBuffer };
+	VDeleter<VkDeviceMemory> uniformBufferMemory{ device, vkFreeMemory };
+
+	VDeleter<VkDescriptorPool> descriptorPool{ device, vkDestroyDescriptorPool };
+	
+	VkDescriptorSet descriptorSet;
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkImage> swapChainImages;
 	VkFormat swapChainImageFormat;
@@ -94,8 +103,15 @@ private:
 	void createSemaphores();
 	void createVertexBuffer();
 	void createIndexBuffer();
+	void createDescriptorSetLayout();
+	void createUniformBuffer();
+	void createDescriptorPool();
+	void createDescriptorSet();
+	void createTextureImage();
 	void initVulkan();
 	void drawFrame();
+
+	void updateUniformBuffer();
 	void mainLoop();
 	void createInstance();
 	void setupDebugCallback();
