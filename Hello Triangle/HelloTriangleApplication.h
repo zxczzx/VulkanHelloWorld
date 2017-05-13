@@ -23,10 +23,10 @@ public:
 	};
 
 	const std::vector<Vertex> vertices = {
-		{ { -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f } },
-		{ { 0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f } },
-		{ { -0.5f, 0.5f },	{ 1.0f, 1.0f, 1.0f } }
+		{ { -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, 0.5f },	{ 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } }
 	};
 
 	const std::vector<uint16_t> indices = {
@@ -52,6 +52,12 @@ private:
 	VDeleter<VkCommandPool> commandPool{ device, vkDestroyCommandPool };
 	VDeleter<VkSemaphore> imageAvailableSemaphore{ device, vkDestroySemaphore };
 	VDeleter<VkSemaphore> renderFinishedSemaphore{ device, vkDestroySemaphore };
+
+	VDeleter<VkImage> textureImage{ device, vkDestroyImage };
+	VDeleter<VkDeviceMemory> textureImageMemory{ device, vkFreeMemory };
+	VDeleter<VkImageView> textureImageView{ device, vkDestroyImageView };
+	VDeleter<VkSampler> textureSampler{ device, vkDestroySampler };
+
 	VDeleter<VkBuffer> vertexBuffer{ device, vkDestroyBuffer };
 	VDeleter<VkDeviceMemory> vertexBufferMemory{ device, vkFreeMemory };
 	VDeleter<VkBuffer> indexBuffer{ device, vkDestroyBuffer };
@@ -89,10 +95,16 @@ private:
 	void recreateSwapChain();
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VDeleter<VkBuffer>& buffer, VDeleter<VkDeviceMemory>& bufferMemory);
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	void copyImage(VkImage srcImage, VkImage dstImage, uint32_t width, uint32_t height);
+	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VDeleter<VkImage>& image, VDeleter<VkDeviceMemory>& imageMemory);
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapChain();
+	void createImageView(VkImage image, VkFormat format, VDeleter<VkImageView>& imageView);
 	void createImageViews();
 	void createShaderModule(const std::vector<char>& code, VDeleter<VkShaderModule>& shaderModule);
 	void createGraphicPipeline();
@@ -108,6 +120,9 @@ private:
 	void createDescriptorPool();
 	void createDescriptorSet();
 	void createTextureImage();
+	void createTextureImageView();
+	void createTextureSampler();
+
 	void initVulkan();
 	void drawFrame();
 
