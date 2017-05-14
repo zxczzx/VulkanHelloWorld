@@ -23,14 +23,20 @@ public:
 	};
 
 	const std::vector<Vertex> vertices = {
-		{ { -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
-		{ { 0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-		{ { -0.5f, 0.5f },	{ 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } }
+		{ { -0.5f, -0.5f, 0.0f },	{ 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, 0.0f },	{ 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f, 0.0f },		{ 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, 0.5f, 0.0f },	{ 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+
+		{ { -0.5f, -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f, -0.5f },	{ 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, 0.5f, -0.5f },	{ 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } }
 	};
 
 	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4,
 	};
 
 private:
@@ -69,6 +75,10 @@ private:
 	VDeleter<VkDeviceMemory> uniformBufferMemory{ device, vkFreeMemory };
 
 	VDeleter<VkDescriptorPool> descriptorPool{ device, vkDestroyDescriptorPool };
+
+	VDeleter<VkImage> depthImage{ device, vkDestroyImage };
+	VDeleter<VkDeviceMemory> depthImageMemory{ device, vkFreeMemory };
+	VDeleter<VkImageView> depthImageView{ device, vkDestroyImageView };
 	
 	VkDescriptorSet descriptorSet;
 	std::vector<VkCommandBuffer> commandBuffers;
@@ -100,11 +110,14 @@ private:
 	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VDeleter<VkImage>& image, VDeleter<VkDeviceMemory>& imageMemory);
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	VkFormat findDepthFormat();
+	bool hasStencilComponent(VkFormat format);
 
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapChain();
-	void createImageView(VkImage image, VkFormat format, VDeleter<VkImageView>& imageView);
+	void createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VDeleter<VkImageView>& imageView);
 	void createImageViews();
 	void createShaderModule(const std::vector<char>& code, VDeleter<VkShaderModule>& shaderModule);
 	void createGraphicPipeline();
@@ -123,6 +136,7 @@ private:
 	void createTextureImageView();
 	void createTextureSampler();
 
+	void createDepthResources();
 	void initVulkan();
 	void drawFrame();
 
