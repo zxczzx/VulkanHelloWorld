@@ -109,7 +109,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\stb-master;F:\VulkanSDK\1.0.39.1\Include;D:\Download\glfw-3.2.1.bin.WIN32\include;C:\Users\Krzysztof\Documents\Projekty\gitRepo\openGLTest\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tinyobjloader-master;..\stb-master;F:\VulkanSDK\1.0.39.1\Include;D:\Download\glfw-3.2.1.bin.WIN32\include;C:\Users\Krzysztof\Documents\Projekty\gitRepo\openGLTest\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -144,7 +144,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>F:\VulkanSDK\1.0.39.1\Include;D:\Download\glfw-3.2.1.bin.WIN32\include;..\stb-master;C:\Users\Krzysztof\Documents\Projekty\gitRepo\openGLTest\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tinyobjloader-master;..\stb-master;F:\VulkanSDK\1.0.39.1\Include;D:\Download\glfw-3.2.1.bin.WIN32\include;..\stb-master;C:\Users\Krzysztof\Documents\Projekty\gitRepo\openGLTest\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

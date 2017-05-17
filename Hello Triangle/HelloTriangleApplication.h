@@ -22,26 +22,14 @@ public:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-	const std::vector<Vertex> vertices = {
-		{ { -0.5f, -0.5f, 0.0f },	{ 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f, 0.0f },	{ 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
-		{ { 0.5f, 0.5f, 0.0f },		{ 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-		{ { -0.5f, 0.5f, 0.0f },	{ 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-
-		{ { -0.5f, -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
-		{ { 0.5f, 0.5f, -0.5f },	{ 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-		{ { -0.5f, 0.5f, -0.5f },	{ 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } }
-	};
-
-	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4,
-	};
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
 private:
 	const int WIDTH;
 	const int HEIGHT;
+	const std::string MODEL_PATH;
+	const std::string TEXTURE_PATH;
 	GLFWwindow* window;
 
 	VDeleter<VkInstance> instance{ vkDestroyInstance };
@@ -137,6 +125,7 @@ private:
 	void createTextureSampler();
 
 	void createDepthResources();
+	void loadModel();
 	void initVulkan();
 	void drawFrame();
 

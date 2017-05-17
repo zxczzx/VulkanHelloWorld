@@ -1,6 +1,8 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define STB_IMAGE_IMPLEMENTATION
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 #include <stb_image.h>
 #include "HelloTriangleApplication.h"
 #include <iostream>
@@ -12,8 +14,10 @@
 #include <glm/glm.hpp>>
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
+#include <unordered_map>
 
-HelloTriangleApplication::HelloTriangleApplication() : WIDTH(800), HEIGHT(600), window(nullptr), graphicQueue(nullptr)
+HelloTriangleApplication::HelloTriangleApplication() : WIDTH(800), HEIGHT(600), MODEL_PATH("models/chalet.obj"),
+	TEXTURE_PATH("textures/chalet.jpg"), window(nullptr), graphicQueue(nullptr)
 {
 }
 
@@ -891,7 +895,7 @@ void HelloTriangleApplication::createCommandBuffers()
 		VkDeviceSize offsets[] = { 0 };
 
 		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 
 		vkCmdDrawIndexed(commandBuffers[i], indices.size(), 1, 0, 0, 0);
@@ -1093,7 +1097,7 @@ void HelloTriangleApplication::createImage(uint32_t width, uint32_t height, VkFo
 void HelloTriangleApplication::createTextureImage() 
 {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("Textures/container2.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) {
@@ -1178,6 +1182,50 @@ void HelloTriangleApplication::createDepthResources()
 	createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, depthImageView);
 
 	transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+}
+
+void HelloTriangleApplication::loadModel()
+{
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string err;
+
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, MODEL_PATH.c_str()))
+	{
+		throw std::runtime_error(err);
+	}
+
+	std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
+	
+	for (const auto& shape : shapes)
+	{
+		for (const auto& index : shape.mesh.indices)
+		{
+			Vertex vertex = {};
+
+			vertex.pos = {
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
+			};
+
+			vertex.texCoord = {
+				attrib.texcoords[2 * index.texcoord_index + 0],
+				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+			};
+
+			vertex.color = { 1.0f, 1.0f, 1.0f };
+
+			if (uniqueVertices.count(vertex) == 0)
+			{
+				uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+				vertices.push_back(vertex);
+			}
+
+			indices.push_back(uniqueVertices[vertex]);
+		}
+	}
 }
 
 VkFormat HelloTriangleApplication::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
@@ -1267,6 +1315,8 @@ void HelloTriangleApplication::initVulkan()
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
+
+	loadModel();
 
 	createVertexBuffer();
 	createIndexBuffer();
